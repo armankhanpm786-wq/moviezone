@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CinemaZone CMS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+margin:0;
+font-family:sans-serif;
+background:#0f172a;
+color:white;
+}
+
+header{
+background:#111827;
+padding:15px;
+text-align:center;
+font-size:20px;
+}
+
+.container{
+padding:10px;
+}
+
+input,textarea{
+width:100%;
+padding:10px;
+margin:5px 0;
+border:none;
+border-radius:6px;
+}
+
+button{
+width:100%;
+padding:10px;
+background:#22c55e;
+border:none;
+color:white;
+border-radius:6px;
+font-size:16px;
+}
+
+.post{
+background:#1f2937;
+padding:10px;
+margin-top:10px;
+border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+🎬 CinemaZone Movie CMS
+</header>
+
+<div class="container">
+
+<input id="title" placeholder="Movie Title">
+<textarea id="desc" placeholder="Movie Description"></textarea>
+
+<button onclick="addPost()">POST</button>
+
+<div id="posts"></div>
+
+</div>
+
+<!-- 🔥 FIREBASE -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+
+// 🔥 YOUR FIREBASE CONFIG (READY)
+const firebaseConfig = {
+  apiKey: "AIzaSyCMt3pXhauTK-jwNPAoh0jSdcPMeAr5daI",
+  authDomain: "cinemazone-60864.firebaseapp.com",
+  databaseURL: "https://cinemazone-60864-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "cinemazone-60864",
+  appId: "1:1068263782484:web:78d3b422a9e233da1e95c1"
+};
+
+// init Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// ➕ ADD POST
+window.addPost = function(){
+let title = document.getElementById("title").value;
+let desc = document.getElementById("desc").value;
+
+if(title === "" || desc === ""){
+alert("Fill all fields");
+return;
+}
+
+push(ref(db, "posts"), {
+title: title,
+desc: desc
+});
+
+document.getElementById("title").value = "";
+document.getElementById("desc").value = "";
+
+alert("Posted successfully!");
+}
+
+// 📥 LOAD POSTS
+const postRef = ref(db, "posts");
+
+onValue(postRef, (snapshot) => {
+let data = snapshot.val();
+let html = "";
+
+for(let id in data){
+html += `
+<div class="post">
+<h3>${data[id].title}</h3>
+<p>${data[id].desc}</p>
+</div>
+`;
+}
+
+document.getElementById("posts").innerHTML = html;
+});
+
+</script>
+
+</body>
+</html>
